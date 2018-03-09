@@ -55,4 +55,4 @@ If ( Test-Path 'HKCR:\ddportal\shell\open\command' ) {
         
 }
 
-Remove-PSDrive -Name HKCR
+Remove-PSDrive -Name HKCR  
