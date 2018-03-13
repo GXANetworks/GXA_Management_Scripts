@@ -26,9 +26,6 @@ param (
 
 #---------------------------------------------------------[Initialisations]--------------------------------------------------------
 
-#Set Error Action to Silently Continue
-$ErrorActionPreference = 'SilentlyContinue'
-
 #Import Modules & Snap-ins
 
 #----------------------------------------------------------[Declarations]----------------------------------------------------------
@@ -62,10 +59,30 @@ Function <FunctionName> {
 #>
 
 
-Function Get-DeskDirectorInstallStatus {
+Function Get-DDInstallStatus {
+    <#
+    .SYNOPSIS
+      Gets current install status for Desk Director Portal
+    .DESCRIPTION
+      Checks if the user portal is registered in HKEY_CLASSES_ROOT and if Machine wide .exe exists 
+
+      .PARAMETER ProductName
+      Product Name is listed in the Desk Director Admin console under DD Portal Installer > Configuration > Product Name
+      .PARAMETER PortalType
+      User, Machine or Both (Default)
+    .INPUTS None
+    .OUTPUTS Boolean Response
+    .NOTES
+      Version:        1.0
+      Author:         Rusty Franks
+      Creation Date:  2018-03-08
+      Purpose/Change: Initial script development
+    .EXAMPLE
+      Get-DDInstallStatus -ProductName "GXA Customer Portal" -PortalType Both
+    #>
+
     [CmdletBinding()]  
     param (
-        # Product Name is listed in the Desk Director Admin console under DD Portal Installer > Configuration > Product Name
         [Parameter(Mandatory = $True)]
         [string]$ProductName,
         
@@ -73,53 +90,57 @@ Function Get-DeskDirectorInstallStatus {
         [ValidateSet("User", "Machine", "Both")]
         [string]$PortalType = "Both"
     )
+
     begin {
-        Write-Verbose 'Checking Install locations for existence of DeskDirector Portal components.'
+        Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
+        Write-Verbose "$(Get-Date -Format u) : Checking Install locations for existence of DeskDirector Portal components."
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
         $UserInstall = $False
         $MachineInstall = $False
         $Return = $False
     }
+
     process {
-        try {
-            if ( Test-Path 'HKCR:\ddportal\shell\open\command' ) {
-                $UserCommand = ( Get-ItemProperty 'HKCR:\ddportal\shell\open\command' ).'(default)'
-                if ( $UserCommand -match "^.+\\" + ($ProductName -replace " ", "_") + "\.exe.+$" ) {
-                    Write-Verbose "DeskDirector User Portal is installed."
-                    $UserInstall = $true
-                }                
-            }            
+          try {
+              if ( Test-Path 'HKCR:\ddportal\shell\open\command' ) {
+                  $UserCommand = ( Get-ItemProperty 'HKCR:\ddportal\shell\open\command' ).'(default)'
+                  if ( $UserCommand -match "^.+\\" + ($ProductName -replace " ", "_") + "\.exe.+$" ) {
+                      Write-Verbose "$(Get-Date -Format u) : DeskDirector User Portal is installed."
+                      $UserInstall = $true
+                  }                
+              }            
 
-            if ( (Test-Path "${env:ProgramFiles(x86)}\$ProductName Installer\deskdirectorportal.exe") -or (Test-Path "${env:ProgramFiles}\$ProductName Installer\deskdirectorportal.exe") ) {
-                Write-Verbose "DeskDirector Machine-Wide installer exists."
-                $MachineInstall = $True
-            }
+              if ( (Test-Path "${env:ProgramFiles(x86)}\$ProductName Installer\deskdirectorportal.exe") -or (Test-Path "${env:ProgramFiles}\$ProductName Installer\deskdirectorportal.exe") ) {
+                  Write-Verbose "$(Get-Date -Format u) : DeskDirector Machine-Wide installer exists."
+                  $MachineInstall = $True
+              }
 
-            switch ($PortalType) {
-                "User" {
-                    if ( $UserInstall -eq $True ) { $Return = $True }
-                }
-                "Machine" {
-                    if ( $MachineInstall -eq $True ) { $Return = $True }
-                }
-                "Both" {
-                  if ( $UserInstall -eq $True -and $MachineInstall -eq $True ) { $Return = $True }
-                }
-            }
-        }
-        catch {
-            Write-Verbose -BackgroundColor Red "Error: $($_.Exception)"
-            else
-        }
+              switch ($PortalType) {
+                  "User" {
+                      if ( $UserInstall -eq $True ) { $Return = $True }
+                  }
+                  "Machine" {
+                      if ( $MachineInstall -eq $True ) { $Return = $True }
+                  }
+                  "Both" {
+                      if ( $UserInstall -eq $True -and $MachineInstall -eq $True ) { $Return = $True }
+                  }
+              }
+          }
+
+          catch {
+              $errorMessage = $_.Exception.Message
+              Write-Error -Message "$(Get-Date -Format u) : Error: [$errorMessage]"
+          }
+
     }
+
     end {
-        if ($?) {
-            Remove-PSDrive -Name HKCR
-            Write-Verbose "Completed Successfully. Result: $Return"
-            return $Return
-        }
+        Remove-PSDrive -Name HKCR
+        Write-Verbose -Message "$(Get-Date -Format u) : Ending $($MyInvocation.InvocationName)..."
+        return $Return    
     }
 }
 
 #-----------------------------------------------------------[Execution]------------------------------------------------------------
-Get-DeskDirectorInstallStatus -ProductName "GXA Customer Portal"
+Get-DDInstallStatus -ProductName "GXA Customer Portal"
