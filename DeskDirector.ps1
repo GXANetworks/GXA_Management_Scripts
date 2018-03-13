@@ -33,32 +33,6 @@ param (
 #Any Global Declarations go here
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
-
-<#
-Function <FunctionName> {
-  Param ()
-  Begin {
-    Write-Host '<description of what is going on>...'
-  }
-  Process {
-    Try {
-      <code goes here>
-    }
-    Catch {
-      Write-Host -BackgroundColor Red "Error: $($_.Exception)"
-      Break
-    }
-  }
-  End {
-    If ($?) {
-      Write-Host 'Completed Successfully.'
-      Write-Host ' '
-    }
-  }
-}
-#>
-
-
 Function Get-DDInstallStatus {
     <#
     .SYNOPSIS
@@ -143,4 +117,3 @@ Function Get-DDInstallStatus {
 }
 
 #-----------------------------------------------------------[Execution]------------------------------------------------------------
-Get-DDInstallStatus -ProductName "GXA Customer Portal"
