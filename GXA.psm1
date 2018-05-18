@@ -118,10 +118,33 @@ Function Get-GxaModules {
     process {
         try {
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            $response = Invoke-WebRequest "https://github.com/GXANetworks/GXA_Managed_Tools/releases/latest"
-            $url = "https://github.com/$(($response.links | where href -match 'zip').href)"
-            $url
+            $response = Invoke-WebRequest "https://github.com/GXANetworks/GXA_Managed_Tools/releases/latest" -UseBasicParsing
+            $url = "https://github.com/$(($response.links | Where-Object href -match 'dist.zip').href)"
+            
+            $installerName = "GXA_Managed_Tools.zip"            
+            $output = "$env:temp\$installerName"
 
+            Write-Verbose "$(Get-Date -Format u) : Downloading $url"
+
+            $wc = New-Object System.Net.WebClient
+            $wc.DownloadFile("$url", $output)   
+
+            Write-Verbose "$(Get-Date -Format u) : Extracting $output to $env:systemdrive\GXA\Scripts"
+
+            New-Item -ItemType Directory -Force -Path "$env:systemdrive\GXA\Scripts" | Out-Null
+            $shell_app = new-object -com shell.application
+            $zip_file = $shell_app.namespace($output)
+            $destination = $shell_app.namespace("$env:systemdrive\GXA\Scripts")
+            $destination.Copyhere($zip_file.items(), 0x14)
+
+            Write-Verbose "$(Get-Date -Format u) : Fixing folder name"
+            $url -Match "https://github.com//GXANetworks/GXA_Managed_Tools/archive/v(?<version>.*).zip" | Out-Null
+            $version = $Matches['version']
+            Get-Item -Path "$env:systemdrive\GXA\Scripts\GXA_Managed_Tools" | Remove-Item -Recurse -Force
+            Rename-Item -Path "$env:systemdrive\GXA\Scripts\GXA_Managed_Tools-$version" -NewName "GXA_Managed_Tools"
+
+            Write-Verbose "$(Get-Date -Format u) : Removing $output"
+            Remove-Item -Path $output -Force
 
         }
 
