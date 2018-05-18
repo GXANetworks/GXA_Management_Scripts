@@ -36,68 +36,61 @@ param (
 Function Get-WebrootStatus {
     <#
     .SYNOPSIS
-      Gets current install status for Desk Director Portal
+      Gets current status for Webroot SecureAnywhere
     .DESCRIPTION
-      Checks if the user portal is registered in HKEY_CLASSES_ROOT and if Machine wide .exe exists
-    .PARAMETER ProductName
-      Product Name is listed in the Desk Director Admin console under DD Portal Installer > Configuration > Product Name
-    .PARAMETER PortalType
-      User, Machine or Both (Default)
+      Checks if Webroot SecureAnywhere is installed and gets status from the registry
+
     .INPUTS None
-    .OUTPUTS Boolean Response
+    .OUTPUTS Array
     .NOTES
       Version:        1.0
       Author:         Rusty Franks
       Creation Date:  2018-03-08
       Purpose/Change: Initial script development
     .EXAMPLE
-      Get-DDInstallStatus -ProductName "GXA Customer Portal" -PortalType Both
     #>
 
     [CmdletBinding()]  
     param (
-        [Parameter(Mandatory = $True)]
-        [string]$ProductName,
-        
-        [Parameter(Mandatory = $False)]
-        [ValidateSet("User", "Machine", "Both")]
-        [string]$PortalType = "Both"
     )
 
     begin {
         Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
-        Write-Verbose "$(Get-Date -Format u) : Checking Install locations for existence of DeskDirector Portal components."
-        New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
-        $UserInstall = $False
-        $MachineInstall = $False
-        $Return = $False
+
+        $status = New-Object -TypeName psobject
+
+        Write-Verbose "$(Get-Date -Format u) : Checking if Webroot is installed"
+
+        $regPath = "HKLM:\SOFTWARE\WOW6432Node\WRData"
+        $installStatus = Test-Path $regPath
+        $status | Add-Member -MemberType NoteProperty -Name 'Installed' -Value $installStatus
     }
 
     process {
         try {
-            if ( Test-Path 'HKCR:\ddportal\shell\open\command' ) {
-                $UserCommand = ( Get-ItemProperty 'HKCR:\ddportal\shell\open\command' ).'(default)'
-                if ( $UserCommand -match "^.+\\" + ($ProductName -replace " ", "_") + "\.exe.+$" ) {
-                    Write-Verbose "$(Get-Date -Format u) : DeskDirector User Portal is installed."
-                    $UserInstall = $true
-                }                
-            }            
+            if ( $installStatus -eq $true ) {
+                
+                $statusKey = Get-ItemProperty Registry::HKLM\SOFTWARE\WOW6432Node\WRData\Status
+                $status | Add-Member -MemberType NoteProperty -Name 'FirewallEnabled' -Value $statusKey.FirewallEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'IsExpired' -Value $statusKey.IsExpired
+                $status | Add-Member -MemberType NoteProperty -Name 'IsFirewallEnabled' -Value $statusKey.IsFirewallEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'isOtherAVEnabled' -Value $statusKey.isOtherAVEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'IsSilent' -Value $statusKey.IsSilent
+                $status | Add-Member -MemberType NoteProperty -Name 'OfflineShieldEnabled' -Value $statusKey.OfflineShieldEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'PhishingShieldEnabled' -Value $statusKey.PhishingShieldEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'ProtectionEnabled' -Value $statusKey.ProtectionEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'RemediationEnabled' -Value $statusKey.RemediationEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'RootkitShieldEnabled' -Value $statusKey.RootkitShieldEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'ScheduledScansEnabled' -Value $statusKey.ScheduledScansEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'USBShieldEnabled' -Value $statusKey.USBShieldEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'WebThreatShieldEnabled' -Value $statusKey.WebThreatShieldEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'SKU' -Value $statusKey.SKU
+                $status | Add-Member -MemberType NoteProperty -Name 'Version' -Value $statusKey.Version
 
-            if ( (Test-Path "${env:ProgramFiles(x86)}\$ProductName Installer\deskdirectorportal.exe") -or (Test-Path "${env:ProgramFiles}\$ProductName Installer\deskdirectorportal.exe") ) {
-                Write-Verbose "$(Get-Date -Format u) : DeskDirector Machine-Wide installer exists."
-                $MachineInstall = $True
+                
             }
-
-            switch ($PortalType) {
-                "User" {
-                    if ( $UserInstall -eq $True ) { $Return = $True }
-                }
-                "Machine" {
-                    if ( $MachineInstall -eq $True ) { $Return = $True }
-                }
-                "Both" {
-                    if ( $UserInstall -eq $True -and $MachineInstall -eq $True ) { $Return = $True }
-                }
+            else {
+                Write-Verbose "$(Get-Date -Format u) : Webroot is not installed"                
             }
         }
 
@@ -109,9 +102,8 @@ Function Get-WebrootStatus {
     }
 
     end {
-        Remove-PSDrive -Name HKCR
         Write-Verbose -Message "$(Get-Date -Format u) : Ending $($MyInvocation.InvocationName)..."
-        return $Return    
+        return $status    
     }
 }
 
