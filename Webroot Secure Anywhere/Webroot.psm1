@@ -74,7 +74,7 @@ Function Get-WebrootStatus {
                 $status | Add-Member -MemberType NoteProperty -Name 'FirewallEnabled' -Value $statusKey.FirewallEnabled
                 $status | Add-Member -MemberType NoteProperty -Name 'IsExpired' -Value $statusKey.IsExpired
                 $status | Add-Member -MemberType NoteProperty -Name 'IsFirewallEnabled' -Value $statusKey.IsFirewallEnabled
-                $status | Add-Member -MemberType NoteProperty -Name 'isOtherAVEnabled' -Value $statusKey.isOtherAVEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'IsOtherAVEnabled' -Value $statusKey.IsOtherAVEnabled
                 $status | Add-Member -MemberType NoteProperty -Name 'IsSilent' -Value $statusKey.IsSilent
                 $status | Add-Member -MemberType NoteProperty -Name 'OfflineShieldEnabled' -Value $statusKey.OfflineShieldEnabled
                 $status | Add-Member -MemberType NoteProperty -Name 'PhishingShieldEnabled' -Value $statusKey.PhishingShieldEnabled
@@ -84,6 +84,7 @@ Function Get-WebrootStatus {
                 $status | Add-Member -MemberType NoteProperty -Name 'ScheduledScansEnabled' -Value $statusKey.ScheduledScansEnabled
                 $status | Add-Member -MemberType NoteProperty -Name 'USBShieldEnabled' -Value $statusKey.USBShieldEnabled
                 $status | Add-Member -MemberType NoteProperty -Name 'WebThreatShieldEnabled' -Value $statusKey.WebThreatShieldEnabled
+                $status | Add-Member -MemberType NoteProperty -Name 'OtherAVProduct' -Value $statusKey.OtherAVProduct
                 $status | Add-Member -MemberType NoteProperty -Name 'SKU' -Value $statusKey.SKU
                 $status | Add-Member -MemberType NoteProperty -Name 'Version' -Value $statusKey.Version
 

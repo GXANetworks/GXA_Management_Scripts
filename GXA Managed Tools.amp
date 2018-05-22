@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><Policy ID="62fc08ce-1cc6-4d12-82a7-0f9341922e60" Name="GXA Managed Tools" Description="RG93bmxvYWRzIGxhdGVzdCBNYW5hZ2VkIFRvb2xzIFNjcmlwdHM=" Version="2.4.1.9" RemoteCategory="0" ExecutionType="Local" PS3ObjectCount="0">
+  <Object ID="{7e36407a-f747-48a4-89eb-c914f0f2f178}" Type="{B6FA6D8B-EEAA-47A6-8463-7F9A4F5BBB6E}" Data="&lt;xml /&gt;" />
+  <LinkManager xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/PolicyExecutor">
+    <hashset xmlns:d2p1="http://schemas.datacontract.org/2004/07/System" />
+  </LinkManager>
+  <Activity mc:Ignorable="sap sads" x:Class="Policy Builder" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:p="clr-namespace:PolicyExecutor;assembly=PolicyExecutionEngine" xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <x:Members>
+      <x:Property Name="PolicyGUID" Type="InArgument(x:String)" />
+    </x:Members>
+    <sap:VirtualizedContainerService.HintSize>587,1529</sap:VirtualizedContainerService.HintSize>
+    <mva:VisualBasic.Settings>Assembly references and imported namespaces serialized as XML namespaces</mva:VisualBasic.Settings>
+    <p:PolicySequence DisplayName="Policy Builder" sap:VirtualizedContainerService.HintSize="587,1529" mva:VisualBasic.Settings="Assembly references and imported namespaces serialized as XML namespaces">
+      <p:PolicySequence.Activities>
+        <p:DownloadFileFromURL OverwriteExistingFile_Item="{x:Null}" OverwriteExistingFile_ItemProp="{x:Null}" RemoteFileURL_Item="{x:Null}" RemoteFileURL_ItemProp="{x:Null}" SaveAsFileName_Item="{x:Null}" SaveAsFileName_ItemProp="{x:Null}" AssemblyName="PolicyExecutionEngine, Version=2.4.1.9, Culture=neutral, PublicKeyToken=null" DisplayName="Download File From URL" sap:VirtualizedContainerService.HintSize="551,160" Moniker="e950498a-67fa-44e1-b826-093a9f8eec42" OverwriteExistingFile="True" OverwriteExistingFile_DisplayArg="true" RemoteFileURL="https://software.gxanetworks.com/Tools/GXA_Managed_Tools.zip" RemoteFileURL_DisplayArg="https://software.gxanetworks.com/Tools/GXA_Managed_Tools.zip" Result="[DownloadFileFromURL_Result]" ResultString="[DownloadFileFromURL_ResultString]" RunAsCurrentLoggedOnUser="False" SaveAsFileName="c:\windows\temp\GXA_Managed_Tools.zip" SaveAsFileName_DisplayArg="c:\windows\temp\GXA_Managed_Tools.zip" ScriptExecutionMethod="ExecuteDebug" TypeName="DownloadFileFromURL" m_bTextLinkChange="False" />
+        <p:CreateFolder Folder_Item="{x:Null}" Folder_ItemProp="{x:Null}" AssemblyName="PolicyExecutionEngine, Version=2.4.1.9, Culture=neutral, PublicKeyToken=null" DisplayName="Create Folder" Folder="c:\GXA" FolderInfo="[CreateFolder_FolderInfo]" Folder_DisplayArg="c:\GXA" sap:VirtualizedContainerService.HintSize="551,88" Moniker="3e731b69-7cff-40a7-856b-3a484f90bf15" Result="[CreateFolder_Result]" ResultString="[CreateFolder_ResultString]" RunAsCurrentLoggedOnUser="False" ScriptExecutionMethod="ExecuteDebug" TypeName="CreateFolder" m_bTextLinkChange="False" />
+        <p:CreateFolder Folder_Item="{x:Null}" Folder_ItemProp="{x:Null}" AssemblyName="PolicyExecutionEngine, Version=2.4.1.9, Culture=neutral, PublicKeyToken=null" DisplayName="Create Folder" Folder="c:\GXA\Scripts" FolderInfo="[CreateFolder_FolderInfo_1]" Folder_DisplayArg="c:\GXA\Scripts" sap:VirtualizedContainerService.HintSize="551,88" Moniker="619ea4bf-794d-4dc4-a39f-f2098639ea9d" Result="[CreateFolder_Result_1]" ResultString="[CreateFolder_ResultString_1]" RunAsCurrentLoggedOnUser="False" ScriptExecutionMethod="ExecuteDebug" TypeName="CreateFolder" m_bTextLinkChange="False" />
+        <p:ExtractCompressedFiles Destination_Item="{x:Null}" Destination_ItemProp="{x:Null}" FileName_Item="{x:Null}" FileName_ItemProp="{x:Null}" AssemblyName="PolicyExecutionEngine, Version=2.4.1.9, Culture=neutral, PublicKeyToken=null" Destination="c:\GXA\Scripts" Destination_DisplayArg="c:\GXA\Scripts" DisplayName="Extract Compressed files" FileName="c:\windows\temp\GXA_Managed_Tools.zip" FileName_DisplayArg="c:\windows\temp\GXA_Managed_Tools.zip" sap:VirtualizedContainerService.HintSize="551,124" Moniker="a09ba156-a8e1-44e5-8e70-c0b2b154df8a" Result="[ExtractCompressedFiles_Result]" ResultString="[ExtractCompressedFiles_ResultString]" RunAsCurrentLoggedOnUser="False" ScriptExecutionMethod="ExecuteDebug" TypeName="ExtractCompressedFiles" m_bTextLinkChange="False" />
+        <p:RunPowerShellScript genArgEvent="{x:Null}" AssemblyName="PolicyExecutionEngine, Version=2.4.1.9, Culture=neutral, PublicKeyToken=null" DisplayName="Run PowerShell Script" sap:VirtualizedContainerService.HintSize="551,522" Moniker="7963f4cc-0b3c-4047-9982-985ea33acaf7" OutPut_64="[RunPowerShellScript_OutPut_64]" Result="[RunPowerShellScript_Result]" ResultString="[RunPowerShellScript_ResultString]" Results_x64="[RunPowerShellScript_Results_x64]" RunAsCurrentLoggedOnUser="False" ScriptExecutionMethod="ExecuteDebug" TypeName="RunPowerShellScript" m_bTextLinkChange="False" script="RwBlAHQALQBJAHQAZQBtACAALQBQAGEAdABoACAAIgBjADoAXABHAFgAQQBcAFMAYwByAGkAcAB0AHMAXABHAFgAQQBfAE0AYQBuAGEAZwBlAGQAXwBUAG8AbwBsAHMAIgAgAC0ARQByAHIAbwByAEEAYwB0AGkAbwBuACAAUwBpAGwAZQBuAHQAbAB5AEMAbwBuAHQAaQBuAHUAZQAgAHwAIABSAGUAbQBvAHYAZQAtAEkAdABlAG0AIAAtAFIAZQBjAHUAcgBzAGUAIAAtAEYAbwByAGMAZQAgAC0ARQByAHIAbwByAEEAYwB0AGkAbwBuACAAUwBpAGwAZQBuAHQAbAB5AEMAbwBuAHQAaQBuAHUAZQANAAoARwBlAHQALQBJAHQAZQBtACAALQBQAGEAdABoACAAIgBjADoAXABHAFgAQQBcAFMAYwByAGkAcAB0AHMAXABHAFgAQQBfAE0AYQBuAGEAZwBlAGQAXwBUAG8AbwBsAHMAKgAiACAAfAAgAFIAZQBuAGEAbQBlAC0ASQB0AGUAbQAgAC0ATgBlAHcATgBhAG0AZQAgACIARwBYAEEAXwBNAGEAbgBhAGcAZQBkAF8AVABvAG8AbABzACIAIAAtAEYAbwByAGMAZQA=">
+          <p:RunPowerShellScript.InArgs>
+            <scg:Dictionary x:TypeArguments="x:String, p:InArg" />
+          </p:RunPowerShellScript.InArgs>
+          <p:RunPowerShellScript.OutArgs>
+            <scg:Dictionary x:TypeArguments="x:String, p:OutArg" />
+          </p:RunPowerShellScript.OutArgs>
+        </p:RunPowerShellScript>
+        <p:DeleteFile FileName_Item="{x:Null}" FileName_ItemProp="{x:Null}" Recurse_Item="{x:Null}" Recurse_ItemProp="{x:Null}" AssemblyName="PolicyExecutionEngine, Version=2.4.1.9, Culture=neutral, PublicKeyToken=null" DisplayName="Delete File" FileName="c:\windows\temp\GXA_Managed_Tools.zip" FileName_DisplayArg="c:\windows\temp\GXA_Managed_Tools.zip" sap:VirtualizedContainerService.HintSize="551,124" Moniker="3bee3da2-0528-458c-87d9-53e45f2ed5eb" Recurse="True" Recurse_DisplayArg="" Result="[DeleteFile_Result]" ResultString="[DeleteFile_ResultString]" RunAsCurrentLoggedOnUser="False" ScriptExecutionMethod="None" TypeName="DeleteFile" m_bTextLinkChange="False" />
+      </p:PolicySequence.Activities>
+      <p:PolicySequence.Variables>
+        <Variable x:TypeArguments="x:String" Name="DownloadFileFromURL_ResultString" />
+        <Variable x:TypeArguments="x:Double" Name="DownloadFileFromURL_Result" />
+        <Variable x:TypeArguments="x:String" Name="CreateFolder_FolderInfo" />
+        <Variable x:TypeArguments="x:String" Name="CreateFolder_ResultString" />
+        <Variable x:TypeArguments="x:Double" Name="CreateFolder_Result" />
+        <Variable x:TypeArguments="x:String" Name="ExtractCompressedFiles_ResultString" />
+        <Variable x:TypeArguments="x:Double" Name="ExtractCompressedFiles_Result" />
+        <Variable x:TypeArguments="x:String" Name="RunPowerShellScript_OutPut_64" />
+        <Variable x:TypeArguments="x:String" Name="RunPowerShellScript_ResultString" />
+        <Variable x:TypeArguments="scg:IEnumerable(x:Object)" Name="RunPowerShellScript_Results_x64" />
+        <Variable x:TypeArguments="x:Double" Name="RunPowerShellScript_Result" />
+        <Variable x:TypeArguments="x:String" Name="DeleteFile_ResultString" />
+        <Variable x:TypeArguments="x:Double" Name="DeleteFile_Result" />
+        <Variable x:TypeArguments="x:String" Name="CreateFolder_FolderInfo_1" />
+        <Variable x:TypeArguments="x:String" Name="CreateFolder_ResultString_1" />
+        <Variable x:TypeArguments="x:Double" Name="CreateFolder_Result_1" />
+      </p:PolicySequence.Variables>
+    </p:PolicySequence>
+  </Activity>
+</Policy>
