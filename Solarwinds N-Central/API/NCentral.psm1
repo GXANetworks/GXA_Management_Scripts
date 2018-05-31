@@ -72,7 +72,7 @@ Function Get-NCentralDeviceCompany {
         $applianceID = $ConfigXML.ApplianceConfig.ApplianceID
 
         # Get credentials
-        $secpasswd = ConvertTo-SecureString "Rht1bNvMBE-D" -AsPlainText -Force
+        $secpasswd = ConvertTo-SecureString $password -AsPlainText -Force
         $creds = New-Object System.Management.Automation.PSCredential ("\$username", $secpasswd)
         $secpasswd = $creds.GetNetworkCredential().Password
 
@@ -133,4 +133,3 @@ Function Get-NCentralDeviceCompany {
 }
 
 #-----------------------------------------------------------[Execution]------------------------------------------------------------
-
