@@ -1,7 +1,5 @@
 # GXA Management Scripts
 
-<img src="https://raw.githubusercontent.com/GXANetworks/GXA_Management_Scripts/master/media/GXA_Logo.png" width="300">
-
 ## About GXA
 
 For more than 10 years, our clients have relied on us to provide Business IT Consulting and managed technology solutions and support to innovate their businesses, improve operational efficiencies, achieve competitive advantages, and simply put – build stronger businesses.
