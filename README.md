@@ -1,4 +1,8 @@
-# GXA Managed Tools
+# GXA Management Scripts
+
+![GXA IT](https://raw.githubusercontent.com/GXANetworks/GXA_Management_Scripts/master/media/GXA_Logo_Low_Res.png)
+
+
 
 ToDo
 BrightGauge
