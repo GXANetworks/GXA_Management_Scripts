@@ -1,6 +1,6 @@
 # GXA Management Scripts
 
-<img src="https://raw.githubusercontent.com/GXANetworks/GXA_Management_Scripts/master/media/GXA_Logo_Low_Res.png" width="300">
+<img src="https://raw.githubusercontent.com/GXANetworks/GXA_Management_Scripts/master/media/GXA_Logo.png" width="300">
 
 ## About GXA
 
