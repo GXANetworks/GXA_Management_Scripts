@@ -1,1 +1,0 @@
-# N-Central Automation Manager
