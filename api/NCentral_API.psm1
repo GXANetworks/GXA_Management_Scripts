@@ -1,4 +1,3 @@
-#requires -version 3
 <#
 .SYNOPSIS
   Collection of functions to manage SolarWinds N-Central
