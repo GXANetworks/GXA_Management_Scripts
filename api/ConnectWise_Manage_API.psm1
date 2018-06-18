@@ -59,17 +59,70 @@ Function Get-ConnectWiseCompanyCustomField {
 
     [CmdletBinding()]  
     param (
+        [Parameter(Mandatory = $true)][String]$fieldName = "",
+        [Parameter(Mandatory = $true)][String]$variablesPath = ""
+    )
+
+    begin {
+        Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
+        Write-Verbose "$(Get-Date -Format u) : Importing Variables from $variablesPath"
+        $variables = Import-Clixml $variablesPath
+    }
+
+    process {
+        try {
+
+            $fieldValue = $variables.$fieldName
+            Write-Verbose "$(Get-Date -Format u) : Returned $fieldValue for $fieldName"   
+
+        }
+
+        catch {
+            $errorMessage = $_.Exception.Message
+            Write-Error -Message "$(Get-Date -Format u) : Error: [$errorMessage]"
+        }
+
+    }
+
+    end {
+        Write-Verbose -Message "$(Get-Date -Format u) : Ending $($MyInvocation.InvocationName)..."
+        return $fieldValue    
+    }
+}
+
+Function Get-ConnectWiseCustomFields {
+    <#
+    .SYNOPSIS
+      Get Company Custom Fields from ConnectWise Manage
+    .DESCRIPTION
+      Get Company Custom Fields from ConnectWise Manage
+
+    .INPUTS None
+    .OUTPUTS Array
+    .NOTES
+      Version:        1.0
+      Author:         Rusty Franks
+      Creation Date:  20180521
+      Purpose/Change: Initial script development
+    .EXAMPLE
+    #>
+
+    [CmdletBinding()]  
+    param (
         [Parameter(Mandatory = $true)][String]$url = "",
         [Parameter(Mandatory = $true)][String]$authCompany = "",
         [Parameter(Mandatory = $true)][String]$authPublic = "",
         [Parameter(Mandatory = $true)][String]$authPrivate = "",
         [Parameter(Mandatory = $true)][String]$companyName = "",
-        [Parameter(Mandatory = $true)][String]$fieldName = ""
+        [Parameter(Mandatory = $true)][String]$variablesPath = ""
+
     )
 
     begin {
         Write-Verbose "$(Get-Date -Format u) : Begin $($MyInvocation.MyCommand)"
         Write-Verbose "$(Get-Date -Format u) : Building Request"
+
+        $customFields = New-Object -TypeName psobject
         
         $authBytes = [System.Text.Encoding]::ASCII.GetBytes("$authCompany+$($authPublic):$AuthPrivate")
         $authEncoded = [Convert]::ToBase64String($authBytes)
@@ -108,13 +161,13 @@ Function Get-ConnectWiseCompanyCustomField {
             $readStream = New-Object System.IO.StreamReader $responseStream
             $data = $readStream.ReadToEnd()
             $result = ConvertFrom-Json20($data)
-
-            Write-Verbose "$(Get-Date -Format u) : Processing Response"   
-        
+      
+            foreach ( $field in $result.customFields ) {
+                $customFields | Add-Member -MemberType NoteProperty -Name $field.caption -Value $field.value
+                Write-Verbose "$(Get-Date -Format u) : Adding $($field.caption): $($field.value)"
+            }
             
-            $fieldValue = ($result.customFields | Where-Object { $_.caption -eq $fieldName }).value
-            Write-Verbose "$(Get-Date -Format u) : Returned $fieldValue for $fieldName"   
-
+            $customFields | Export-Clixml $variablesPath
         }
 
         catch {
@@ -126,7 +179,7 @@ Function Get-ConnectWiseCompanyCustomField {
 
     end {
         Write-Verbose -Message "$(Get-Date -Format u) : Ending $($MyInvocation.InvocationName)..."
-        return $fieldValue    
+        return
     }
 }
 
@@ -134,11 +187,12 @@ Function Get-ConnectWiseCompanyCustomField {
 
 
 #-----------------------------------------------------------[Signature]------------------------------------------------------------
+
 # SIG # Begin signature block
 # MIIa6QYJKoZIhvcNAQcCoIIa2jCCGtYCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCAAFIgFjDEV4zG9
-# XHIfwxYe7iab3hMpJLxxw5g50g+/QaCCCgkwggTQMIIDuKADAgECAgEHMA0GCSqG
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCB7SKTiWcftE4DE
+# erubH/99bD1+S5sKfel6IrYssavAo6CCCgkwggTQMIIDuKADAgECAgEHMA0GCSqG
 # SIb3DQEBCwUAMIGDMQswCQYDVQQGEwJVUzEQMA4GA1UECBMHQXJpem9uYTETMBEG
 # A1UEBxMKU2NvdHRzZGFsZTEaMBgGA1UEChMRR29EYWRkeS5jb20sIEluYy4xMTAv
 # BgNVBAMTKEdvIERhZGR5IFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IC0gRzIw
@@ -198,17 +252,17 @@ Function Get-ConnectWiseCompanyCustomField {
 # cnkvMTMwMQYDVQQDEypHbyBEYWRkeSBTZWN1cmUgQ2VydGlmaWNhdGUgQXV0aG9y
 # aXR5IC0gRzICCQCIXJ5IjwuM/jANBglghkgBZQMEAgEFAKB8MBAGCisGAQQBgjcC
 # AQwxAjAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsx
-# DjAMBgorBgEEAYI3AgEVMC8GCSqGSIb3DQEJBDEiBCCIE+X1QDU2Q6ADYNfpsXEw
-# PaVebwFrkjyRpiB1ZNPS0TANBgkqhkiG9w0BAQEFAASCAQA7YQ84hbNQtfCVuzuV
-# YLrZevCPk6Mp61+6j4pqHHNFlWuJMsZnkfeoXT8cYPymCtUPO6xAsnocgafZ9/w9
-# mJVu72nNSGU9nTNQLHoCrjJd9dio3z3fa18EHMj51PawtXpyGf9V/9i6nP1UrSfl
-# 3lSVSkvKQ88wVtF+TX5HjM3H8Q6C+rnQGwwh1Dvtn/Vi6TbyCaEiVOF3pa0haES1
-# GXhY6Kpv/aQusX41/AIaHgqO1EhaiAROAdHzdBgMrfhtb2icoH9ZhfN2/YkzJfzo
-# Vl85Va5dQ4aWWMdnBjWXs8Zy6S+izlSMyWl9pTXWt7WsIyQ/U5Yybg/HnDTzRK0I
-# y7yUoYINxjCCDcIGCisGAQQBgjcDAwExgg2yMIINrgYJKoZIhvcNAQcCoIINnzCC
+# DjAMBgorBgEEAYI3AgEVMC8GCSqGSIb3DQEJBDEiBCAqzsIowcvbKkUUX43JDpIZ
+# CvyVGCP9YqUmPx+sFWrqvjANBgkqhkiG9w0BAQEFAASCAQCECeYmjKqrZvbUROi4
+# qwS3DlMoWUY5q/+Lj+4K9nmqs3/FlIgZ2m+wwMLkGmYycTk0zCukph298Xt6/+/h
+# 5xY+Se1OxjqWxKl+1G1ljimtoqLsE4YEoc83kdkKVviyVa9denIGtYwm7SyagNt0
+# qkyH1hc2ondEk7bzmsHUzlvRyxABg5SV+7xzf94qABWhezhfaBooEsZVXXcgY8iN
+# AAVh/NeCIa1i8ENqHWDGzLoogeOE/rlR1saZZyjliueh0niS4ZPjS8JTurHaEUEZ
+# hknRDHlnbewsZBy8HyBjjKmC7owzJivV1GnUfhtjtfjzQ//tJ/RFy/VUi+mBsrjP
+# Nfs+oYINxjCCDcIGCisGAQQBgjcDAwExgg2yMIINrgYJKoZIhvcNAQcCoIINnzCC
 # DZsCAQMxDzANBglghkgBZQMEAgEFADBdBgsqhkiG9w0BCRABBKBOBEwwSgIBAQYK
-# YIZIAYb9bgEHGDAhMAkGBSsOAwIaBQAEFAaP4ngvtnaYCcmK378Fim7UPzjXAgUx
-# LjOtIxgPMjAxODA2MDYxNjA2NTZaoIIKhTCCBQAwggPooAMCAQICAQcwDQYJKoZI
+# YIZIAYb9bgEHGDAhMAkGBSsOAwIaBQAEFARKD6ypamg5AmtQ8Arrbk+gRfoDAgUx
+# LtzOBxgPMjAxODA2MTgxOTA4MDhaoIIKhTCCBQAwggPooAMCAQICAQcwDQYJKoZI
 # hvcNAQELBQAwgY8xCzAJBgNVBAYTAlVTMRAwDgYDVQQIEwdBcml6b25hMRMwEQYD
 # VQQHEwpTY290dHNkYWxlMSUwIwYDVQQKExxTdGFyZmllbGQgVGVjaG5vbG9naWVz
 # LCBJbmMuMTIwMAYDVQQDEylTdGFyZmllbGQgUm9vdCBDZXJ0aWZpY2F0ZSBBdXRo
@@ -270,13 +324,13 @@ Function Get-ConnectWiseCompanyCustomField {
 # VQQLEypodHRwOi8vY2VydHMuc3RhcmZpZWxkdGVjaC5jb20vcmVwb3NpdG9yeS8x
 # NDAyBgNVBAMTK1N0YXJmaWVsZCBTZWN1cmUgQ2VydGlmaWNhdGUgQXV0aG9yaXR5
 # IC0gRzICCQDvlcL0gOMbkzANBglghkgBZQMEAgEFAKCBmDAaBgkqhkiG9w0BCQMx
-# DQYLKoZIhvcNAQkQAQQwHAYJKoZIhvcNAQkFMQ8XDTE4MDYwNjE2MDY1NlowKwYL
+# DQYLKoZIhvcNAQkQAQQwHAYJKoZIhvcNAQkFMQ8XDTE4MDYxODE5MDgwOFowKwYL
 # KoZIhvcNAQkQAgwxHDAaMBgwFgQUDV40fNWzeT7P6ua4YNsPVV2+JKUwLwYJKoZI
-# hvcNAQkEMSIEIKwr8g59ajsbd/jixcnihgK7COmCPSoeYTirsxtU3TM3MA0GCSqG
-# SIb3DQEBAQUABIIBAGdx5ttcvNYDcxqk3MLtO2My93mbzrX8e0gcazCDp31S6tF9
-# FkhooJOvf+jnkLvJiZRQs7Jo1xV0exeQjHRooTLebJN0cBHjffRpybZHmJnBwVrr
-# nGbwAriU1s1XQK0DvB6jCawT6r7ZBi6tk5V4o9nfw4hNJJ7D/xxnZCKezLepCqZl
-# nlEyn6JT8aA9wjbum04cqaFszwUYh/boz9mVr5D45UHiYaYK5to+qrI+TVULJoC5
-# 91wmCSO7v8zXEI3Os9WMlmNN9/Dr1w7D7ikuAML8xez8gv+dGlHMb+ebimBvU2By
-# JU5QuNi4M3WS/zqe4NxWvqd0/hmv81TytpFhXNk=
+# hvcNAQkEMSIEIJJn3Jbqx/bP3GseBFRxJcYCB15n0Jvr1sYhDagkT4cdMA0GCSqG
+# SIb3DQEBAQUABIIBANJX4LiLgEnetfizIeyW53cLTvEI7iH1XjD0EHuF/BUJaRDu
+# 4uf9+Nfb6hS7OHB3cMuvLA7UZIXSqp2mKIuY2VoSCnjKWfkdRUirNyGlxQFkfVFJ
+# dl/w27Ukk0NkyYHJ0TOGyrV1wdZAZ/dpKDbdIvxAXJF0IF74wEleAtNNpnn+3K3R
+# xhye8I1vLQz/t2ulFlhqaS9yJr6J1azqBsZ9IvE+NWGKHbicyPc/HbXKt1wiwQWt
+# cD50tRoFK0eG3QFG4CHgnX089xQ89KimO4shYdvCDFaBmOIqhdefjGnQncJDrG7p
+# zHr6F+ItD4iG+zEkKC6cZokmYqUmIk0Gn1OIbmM=
 # SIG # End signature block
